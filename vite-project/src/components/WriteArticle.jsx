@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
+
+const BASE_URL = import.meta.env.VITE_API_URL;
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "../store/authStore";
@@ -36,7 +38,7 @@ const currentUser = useAuthStore(state => state.currentUser);
     articleObj.author=currentUser._id;
     try {
       await axios.post(
-        "http://localhost:4000/author-api/articles",
+        `${BASE_URL}/author-api/articles`,
         articleObj,
         { withCredentials: true }
       );

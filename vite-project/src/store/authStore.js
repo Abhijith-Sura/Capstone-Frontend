@@ -1,6 +1,8 @@
 import { create } from "zustand"
 import axios, { isAxiosError } from "axios"
 
+const BASE_URL = import.meta.env.VITE_API_URL
+
 export const useAuthStore = create(set => ({
     currentUser: null,
     token: localStorage.getItem("token") || null,
@@ -13,7 +15,7 @@ export const useAuthStore = create(set => ({
             //set loading true
             set({ loading: true, error: null })
             //make api call
-            let res = await axios.post("http://localhost:4000/common-api/login", userCredObj, { withCredentials: true })
+            let res = await axios.post(`${BASE_URL}/common-api/login`, userCredObj, { withCredentials: true })
             console.log("Login response data:", res.data)
 
             // Backend might be returning an axios response object itself, or wrapping in .data
@@ -45,7 +47,7 @@ export const useAuthStore = create(set => ({
             //set loading state
             set({ loading: true, error: null })
             //make logout api request
-            let res = await axios.get("http://localhost:4000/common-api/logout", { withCredentials: true })
+            let res = await axios.get(`${BASE_URL}/common-api/logout`, { withCredentials: true })
             localStorage.removeItem("token")
             //update state
             set({

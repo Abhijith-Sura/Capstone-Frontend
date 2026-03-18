@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import RootLayout from './components/RootLayout'
 import Home from './components/Home'
 import Login from './components/Login'
@@ -23,6 +23,7 @@ function App() {
           path: "/author-profile",
           element: <AuthorProfile />, 
           children: [
+            { index: true, element: <Navigate to="articles" replace /> },
             { path: "articles", element: <AuthorArticle /> },
             { path: "write-article", element: <WriteArticle /> }
           ]

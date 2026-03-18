@@ -4,6 +4,8 @@ import axios from 'axios'
 import { useNavigate } from 'react-router'
 import * as styles from "../styles/common"
 
+const BASE_URL = import.meta.env.VITE_API_URL
+
 function Register() {
     const { register, handleSubmit } = useForm()
     const [loading, setLoading] = useState(false)
@@ -19,7 +21,7 @@ function Register() {
             //make API req to user/author registation
             if (newUser.role === "user") {
                 //make API req to user registation
-                let resObj = await axios.post("http://localhost:4000/user-api/users", userObj)
+                let resObj = await axios.post(`${BASE_URL}/user-api/users`, userObj)
                 console.log(resObj)
                 let res = resObj.data
                 if (resObj.status === 201) {
@@ -29,7 +31,7 @@ function Register() {
             }
             if (newUser.role === "author") {
                 //make API req to author registation
-                let resObj = await axios.post("http://localhost:4000/author-api/users", userObj)
+                let resObj = await axios.post(`${BASE_URL}/author-api/users`, userObj)
                 let res = resObj.data
                 if (resObj.status === 201) {
                     navigate("/login")

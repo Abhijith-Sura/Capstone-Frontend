@@ -3,6 +3,8 @@ import { useLocation, useParams } from 'react-router-dom'
 import * as styles from '../styles/common.js'
 import axios from 'axios'
 
+const BASE_URL = import.meta.env.VITE_API_URL
+
 function ArticleByID() {
     const { articleId } = useParams()
     const { state } = useLocation()
@@ -15,7 +17,7 @@ function ArticleByID() {
             const fetchArticle = async () => {
                 setLoading(true)
                 try {
-                    const res = await axios.get(`http://localhost:4000/common-api/articles/${articleId}`)
+                    const res = await axios.get(`${BASE_URL}/common-api/articles/${articleId}`)
                     setArticle(res.data.payload)
                 } catch (err) {
                     setError(err.response?.data?.message || 'Failed to fetch article')

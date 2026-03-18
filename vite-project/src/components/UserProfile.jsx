@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import * as styles from '../styles/common.js'
 import axios from 'axios'
 
+const BASE_URL = import.meta.env.VITE_API_URL
+
 
 function UserProfile() {
     const logout = useAuthStore(state => state.logout)
@@ -22,7 +24,7 @@ function UserProfile() {
             setLoading(true)
             try {
                 console.log("UserProfile: Fetching articles with token:", token)
-                let res = await axios.get("http://localhost:4000/user-api/articles", {
+                let res = await axios.get(`${BASE_URL}/user-api/articles`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     },
