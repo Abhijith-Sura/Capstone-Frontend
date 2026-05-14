@@ -2,6 +2,7 @@ import { create } from "zustand"
 import axios from "axios"
 
 const BASE_URL = import.meta.env.VITE_API_URL
+console.log("Using API BASE_URL:", BASE_URL);
 
 export const useAuthStore = create(set => ({
     currentUser: null,
