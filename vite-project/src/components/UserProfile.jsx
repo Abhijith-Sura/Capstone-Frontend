@@ -14,6 +14,9 @@ function UserProfile() {
     const [articles, setArticles] = useState([])
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState("")
+
+    const categories = ["technology", "programming", "ai", "web-development"]
     const onLogout = async () => {
         await logout()
         navigate("/login")
@@ -23,27 +26,28 @@ function UserProfile() {
         const getArticles = async () => {
             setLoading(true)
             try {
-                console.log("UserProfile: Fetching articles with token:", token)
-                let res = await axios.get(`${BASE_URL}/user-api/articles`, {
+                const url = selectedCategory 
+                    ? `${BASE_URL}/user-api/articles?category=${selectedCategory}`
+                    : `${BASE_URL}/user-api/articles`
+                
+                let res = await axios.get(url, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     },
                     withCredentials: true
                 })
-                console.log("UserProfile: Articles response:", res.data)
                 setArticles(res.data.payload || [])
             } catch (err) {
-                console.error("UserProfile: Fetch articles error:", err)
                 setError(err.response?.data.error || "failed to fetch articles")
             } finally {
                 setLoading(false)
             }
         }
         getArticles()
-    }, [])
+    }, [selectedCategory, token])
 
     const readMore = (article) => {
-        navigate(`/article/${article.articleId}`, { state: article })
+        navigate(`/article/${article._id}`, { state: article })
     }
 
     return (
@@ -61,6 +65,24 @@ function UserProfile() {
                 </button>
             </div>
 
+            <div className="mb-10 flex flex-wrap gap-3">
+                <button 
+                    onClick={() => setSelectedCategory("")}
+                    className={selectedCategory === "" ? styles.primaryBtn : styles.secondaryBtn}
+                >
+                    All
+                </button>
+                {categories.map(cat => (
+                    <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={selectedCategory === cat ? styles.primaryBtn : styles.secondaryBtn + " capitalize"}
+                    >
+                        {cat.replace('-', ' ')}
+                    </button>
+                ))}
+            </div>
+
             {loading ? (
                 <div className={styles.loadingClass}>Searching for excellence...</div>
             ) : error ? (
@@ -69,7 +91,7 @@ function UserProfile() {
                 <div className={styles.articleGrid}>
                     {articles.map(article => (
                         <div
-                            key={article.articleId}
+                            key={article._id}
                             className={styles.articleCardClass}
                             onClick={() => readMore(article)}
                         >

@@ -23,6 +23,7 @@ function WriteArticle() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 const currentUser = useAuthStore(state => state.currentUser);
+  const token = useAuthStore(state => state.token);
 
   const {
     register,
@@ -40,7 +41,10 @@ const currentUser = useAuthStore(state => state.currentUser);
       await axios.post(
         `${BASE_URL}/author-api/articles`,
         articleObj,
-        { withCredentials: true }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true
+        }
       );
 
       toast.success("Article published successfully!");

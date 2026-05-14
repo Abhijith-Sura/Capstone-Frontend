@@ -19,15 +19,14 @@ function Login() {
     }
     useEffect(() => {
         if (isAuthenticated && currentUser) {
-            console.log(currentUser)
-            if (currentUser.role === "USER") {
+            const role = currentUser.role?.toUpperCase()
+            if (role === "USER") {
                 navigate("/user-profile")
-            }
-            if (currentUser.role === "AUTHOR") {
+            } else if (role === "AUTHOR") {
                 navigate("/author-profile")
             }
         }
-    }, [isAuthenticated, currentUser])
+    }, [isAuthenticated, currentUser, navigate])
     return (
         <div className={styles.formCard}>
             <h2 className={styles.formTitle}>Login</h2>
@@ -56,7 +55,7 @@ function Login() {
                 </button>
             </form>
             <p className={styles.mutedText + " text-center mt-6"}>
-                Don't have an account? <span className={styles.linkClass + " cursor-pointer"}>Create one</span>
+                Don't have an account? <span className={styles.linkClass + " cursor-pointer"} onClick={() => navigate('/register')}>Create one</span>
             </p>
         </div>
     )

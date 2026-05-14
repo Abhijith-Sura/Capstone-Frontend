@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { useNavigate } from 'react-router'
@@ -11,38 +11,51 @@ function Register() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const navigate = useNavigate()
-    const [] = useState()
+    const [preview, setPreview] = useState(null)
 
     const onUserRegister = async (newUser) => {
-        console.log(newUser)
+        // Create form data object
+        const formData = new FormData();
+        //get user object
+        const { role, profilePic, ...userObj } = newUser;
+        
+        //add all fields except profilePic to FormData object
+        Object.keys(userObj).forEach((key) => {
+            formData.append(key, userObj[key]);
+        });
+        
+        // add profilePic to Formdata object
+        if (profilePic && profilePic[0]) {
+            formData.append("profilePic", profilePic[0]);
+        }
+        
         try {
-            let { role, ...userObj } = newUser
             setLoading(true)
-            //make API req to user/author registation
-            if (newUser.role === "user") {
-                //make API req to user registation
-                let resObj = await axios.post(`${BASE_URL}/user-api/users`, userObj)
-                console.log(resObj)
-                let res = resObj.data
-                if (resObj.status === 201) {
-                    navigate("/login")
-                }
-
-            }
-            if (newUser.role === "author") {
-                //make API req to author registation
-                let resObj = await axios.post(`${BASE_URL}/author-api/users`, userObj)
-                let res = resObj.data
-                if (resObj.status === 201) {
-                    navigate("/login")
-                }
+            setError(null)
+            
+            const endpoint = role === "author" ? "author-api" : "user-api"
+            const resObj = await axios.post(`${BASE_URL}/${endpoint}/users`, formData)
+            
+            if (resObj.status === 201) {
+                navigate("/login")
+            } else {
+                // Handle cases where backend returns 200/other for failure
+                setError(resObj.data.error || resObj.data.message || "Registration failed")
             }
         } catch (err) {
-            setError(err.response?.data.error || "Registration failed")
+            setError(err.response?.data.error || err.response?.data.message || "Registration failed")
         } finally {
             setLoading(false)
         }
     }
+
+    useEffect(() => {
+        return () => {
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
+        };
+    }, [preview]);
 
     //loading
     if (loading === true) {
@@ -116,18 +129,50 @@ function Register() {
                     </div>
 
                     <div>
-                        <label className={styles.labelClass}>Profile Image URL</label>
-                        <input type='text' {...register("profileImageUrl")} placeholder='https://example.com/photo.jpg' className={styles.inputClass} />
-                    </div>
+                        <label className={styles.labelClass}>Upload Logo / Profile Picture</label>
+<input
+        type="file"
+        accept="image/png, image/jpeg"
+        {...register("profilePic", {
+            onChange: (e) => {
+                //get image file
+                const file = e.target.files[0];
+                // validation for image format
+                if (file) {
+                    if (!["image/jpeg", "image/png"].includes(file.type)) {
+                        setError("Only JPG or PNG allowed");
+                        return;
+                    }
+                    //validation for file size
+                    if (file.size > 2 * 1024 * 1024) {
+                        setError("File size must be less than 2MB");
+                        return;
+                    }
+                    //Converts file → temporary browser URL(create preview URL)
+                    const previewUrl = URL.createObjectURL(file);
+                    setPreview(previewUrl);
+                    setError(null);
+                }
+            }
+        })} />
+        {preview && (
+                <div className="mt-3 flex justify-center">
+                <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-24 h-24 object-cover rounded-full border"
+                    />
                 </div>
-
+            )}
+            </div>
+            </div>  
                 <button type='submit' className={styles.submitBtn}>
                     {loading ? 'Creating account...' : 'Create Account'}
                 </button>
             </form>
 
             <p className={styles.mutedText + " text-center mt-6"}>
-                Already have an account? <span className={styles.linkClass + " cursor-pointer"}>Sign in</span>
+                Already have an account? <span className={styles.linkClass + " cursor-pointer"} onClick={() => navigate('/login')}>Sign in</span>
             </p>
         </div>
     )

@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import axios, { isAxiosError } from "axios"
+import axios from "axios"
 
 const BASE_URL = import.meta.env.VITE_API_URL
 
@@ -9,64 +9,89 @@ export const useAuthStore = create(set => ({
     error: null,
     loading: false,
     isAuthenticated: !!localStorage.getItem("token"),
-    login: async (userCredWithRole) => {
-        const { role, ...userCredObj } = userCredWithRole
+
+    login: async (userCredObj) => {
         try {
-            //set loading true
             set({ loading: true, error: null })
-            //make api call
             let res = await axios.post(`${BASE_URL}/common-api/login`, userCredObj, { withCredentials: true })
-            console.log("Login response data:", res.data)
 
-            // Backend might be returning an axios response object itself, or wrapping in .data
-            const actualData = res.data.data && res.data.status ? res.data.data : res.data
-            const payload = actualData.payload || res.data.payload
-            const token = actualData.token || payload?.token || res.data.token
+            const token = res.data.token
+            const user = res.data.payload
 
-            if (token) {
-                console.log("Token found:", token)
+            if (token && user) {
                 localStorage.setItem("token", token)
-                set({ token: token, loading: false, isAuthenticated: true, currentUser: payload })
+                set({
+                    token,
+                    loading: false,
+                    isAuthenticated: true,
+                    currentUser: user,
+                    error: null
+                })
             } else {
-                console.error("TOKEN NOT FOUND! Structure:", res.data)
-                set({ loading: false, isAuthenticated: true, currentUser: payload })
+                set({
+                    loading: false,
+                    isAuthenticated: false,
+                    error: "Login failed: unexpected server response",
+                    currentUser: null
+                })
             }
-
         } catch (err) {
-            console.log("err is", err)
             set({
                 loading: false,
                 isAuthenticated: false,
-                error: err.response?.data?.error || "error",
+                error: err.response?.data?.error || err.response?.data?.message || "Login failed",
                 currentUser: null
             })
         }
     },
+
     logout: async () => {
         try {
-            //set loading state
             set({ loading: true, error: null })
-            //make logout api request
-            let res = await axios.get(`${BASE_URL}/common-api/logout`, { withCredentials: true })
+            await axios.get(`${BASE_URL}/common-api/logout`, { withCredentials: true })
+        } catch (_) {
+            // even if the server call fails, clear local state
+        } finally {
             localStorage.removeItem("token")
-            //update state
             set({
                 loading: false,
                 isAuthenticated: false,
                 currentUser: null,
                 token: null
             })
-        } catch (err) {
-            console.log("err is", err)
+        }
+    },
+
+    // Restore session on page refresh — calls /check-auth with Bearer token
+    checkAuth: async () => {
+        const token = localStorage.getItem("token")
+        if (!token) {
+            set({ loading: false, isAuthenticated: false, currentUser: null })
+            return
+        }
+        try {
+            set({ loading: true })
+            const res = await axios.get(`${BASE_URL}/common-api/check-auth`, {
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
+            })
             set({
+                currentUser: res.data.payload,
+                token,
+                isAuthenticated: true,
                 loading: false,
+            })
+        } catch (err) {
+            // Token expired or invalid — clear everything
+            localStorage.removeItem("token")
+            set({
+                currentUser: null,
                 isAuthenticated: false,
-                error: err.response?.data?.error || "error,login failed",
-                currentUser: null
+                token: null,
+                loading: false,
             })
         }
     }
 }))
-
 
 export default useAuthStore
