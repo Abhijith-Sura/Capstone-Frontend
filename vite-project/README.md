@@ -287,7 +287,3 @@ Ensure all environment variables from the backend `.env` file are added to Rende
 * `DB_URL` *(Your live MongoDB Atlas connection string)*
 * `JWT_SECRET` *(Your secure cryptographic signature secret key)*
 * `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` *(If image uploading is enabled)*
-
-
-
-*Designed Blog App with ❤️*
