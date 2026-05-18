@@ -1,4 +1,4 @@
-#  Blogify Client — Premium React 19 Frontend
+#  Blog App Client — Premium React 19 Frontend
 
 [![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-7.3.1-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
