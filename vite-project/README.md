@@ -288,12 +288,6 @@ Ensure all environment variables from the backend `.env` file are added to Rende
 * `JWT_SECRET` *(Your secure cryptographic signature secret key)*
 * `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` *(If image uploading is enabled)*
 
-> [!TIP]
-> **Render Free Tier Spin-Down Notice (Cold Starts):**
-> If you are deploying the backend on Render's **Free Instance Tier**, the server automatically spins down (goes to sleep) after 15 minutes of inactivity. 
-> * **The Behavior:** When a user first opens the frontend after a period of inactivity, the initial check-auth or login request will hang or feel stuck in a "logging in..." state for about **50 seconds** while the Render container reboots.
-> * **Recommendation:** This is completely normal behavior on the free tier. Your app is NOT broken; it just takes a moment to boot. Consider adding a clean spinner or loading toast in the UI during this authentication phase to improve UX, or consider upgrading to Render's basic paid tier for 100% server uptime.
 
----
 
-*Designed with ❤️ in alignment with the Google Deepmind Advanced Agentic Coding specifications. *
+*Designed Blog App with ❤️*
